@@ -1,0 +1,83 @@
+Temporal-Aware RAG Project Overview
+===================================
+
+Project Purpose
+---------------
+Temporal-Aware RAG is a modern, Django-based Retrieval-Augmented Generation (RAG) system that combines semantic search with temporal awareness. It is designed to answer user questions by retrieving the most relevant documents from a knowledge base, ranking them by both semantic similarity and time relevance, and generating answers using a large language model (LLM).
+
+Key Features
+------------
+- **Semantic Search**: Uses sentence-transformer embeddings and FAISS for fast, meaning-based document retrieval.
+- **Temporal Awareness**: Boosts or penalizes documents based on their recency or historical relevance, depending on the user's query.
+- **Conversational Answer Mode**: Optionally breaks down answers into a series of short, chat-like messages for better readability and engagement.
+- **Modern UI/UX**: Clean, responsive interface with dark mode, animated star background, and a professional color palette.
+- **Easy Extensibility**: Add new documents, retrain embeddings, or swap out the LLM backend as needed.
+
+Architecture & Workflow
+-----------------------
+1. **User Query**: The user submits a question through the web interface.
+2. **Temporal Bias Detection**: The system analyzes the query for temporal cues (e.g., "recent", "history", "trends") to determine if the user wants recent or older information.
+3. **Document Retrieval**:
+   - The query is embedded using a sentence-transformer model.
+   - FAISS is used to find the most semantically similar documents in the knowledge base.
+   - Each document is scored and re-ranked based on its timestamp and the detected temporal bias.
+4. **Answer Generation**:
+   - The top documents are passed to a large language model (LLM, e.g., Groq's Llama3-8b-8192) along with the user's question.
+   - The LLM generates a detailed answer, either as a single block (regular mode) or as a sequence of short, conversational messages (conversational mode).
+5. **Display**:
+   - The answer is shown in a visually appealing card or chat interface.
+   - Retrieved documents and their scores are displayed for transparency.
+   - Users can toggle between regular and conversational answer modes.
+
+Unique Aspects
+--------------
+- **Temporal Scoring**: Unlike standard RAG systems, this project adjusts document relevance based on the user's intent for "recent" or "historical" information.
+- **Conversational Mode**: Answers can be delivered as a series of chat bubbles, making complex information easier to digest.
+- **Modern Design**: The UI is inspired by top tech companies, with dark mode, animated backgrounds, and a custom favicon/logo.
+- **Extensive Dataset**: Includes hundreds of up-to-date documents across AI, cloud, cybersecurity, and more.
+
+How to Use
+----------
+1. **Install dependencies**: `pip install -r requirements.txt`
+2. **Ingest documents**: `python ragapp/ingest.py` (creates embeddings and FAISS index)
+3. **Run the server**: `python manage.py runserver`
+4. **Open the app**: Go to `http://127.0.0.1:8000/` in your browser
+5. **Ask questions**: Try queries like:
+   - "What are the latest advances in AI?"
+   - "What were the major cyber attacks in 2024?"
+   - "How has cloud security evolved in the last five years?"
+6. **Switch modes**: Use the toggle to try both regular and conversational answer modes.
+
+Customization & Extensibility
+-----------------------------
+- **Add new documents**: Update `ragapp/docs.json` and re-run `ingest.py`.
+- **Change the LLM**: Update the API integration in `views.py`.
+- **Modify temporal logic**: Edit `ragapp/utils.py` for custom scoring.
+- **UI tweaks**: Edit `ragapp/static/ragapp/style.css` and `ragapp/templates/ragapp/home.html`.
+
+Main Business Logic: Key Files & Their Importance
+-------------------------------------------------
+- **ragapp/views.py**: This is the core of the application's runtime logic. It handles user queries, retrieves and ranks relevant documents using semantic and temporal scoring, and interacts with the LLM (Groq API) to generate answers. It also manages the conversational answer mode, robustly parses LLM responses, and orchestrates the flow from user input to answer display. Any change to how questions are answered, how context is built, or how the LLM is used happens here.
+
+- **ragapp/utils.py**: This file contains the temporal intelligence logic. It defines how document timestamps influence their relevance (via `temporal_score`) and how the system detects whether a query is seeking recent or historical information (`detect_time_bias`). Adjusting these functions changes the system's temporal awareness and directly impacts the quality and relevance of answers.
+
+- **ragapp/ingest.py**: This script is responsible for preparing the knowledge base. It loads documents, generates embeddings using a sentence-transformer, and builds the FAISS index for fast semantic search. Running this script is required whenever new documents are added or the embedding model is changed. It ensures the retrieval system is up-to-date and efficient.
+
+These files together form the backbone of the RAG workflow: ingestion (building the knowledge base), retrieval and ranking (combining semantic and temporal logic), and answer generation (LLM integration and response formatting).
+
+Key Data Files: index.faiss & embeddings.pkl
+--------------------------------------------
+- **index.faiss**: A fast vector search index created by FAISS in `ingest.py`. It enables instant retrieval of the most relevant documents for any query. Rebuild this file by re-running `ingest.py` whenever your documents or embedding model change.
+- **embeddings.pkl**: A pickled file storing all document metadata and their vector embeddings. Also created by `ingest.py`, it is loaded at runtime to map search results back to the original documents. Update this file alongside `index.faiss` whenever your data changes.
+
+Both files are essential for efficient, real-time semantic search in your RAG system.
+
+Gemini Flash API Integration
+---------------------------
+- **What is Gemini Flash?** Gemini Flash is a state-of-the-art large language model (LLM) from Google, accessible via the Gemini API. It is designed for fast, high-quality, and up-to-date answer generation, with the ability to synthesize information from recent web data.
+- **How is it used?** In this project, Gemini Flash powers the "Web Answer" mode. When selected, user queries are sent directly from the frontend to the Gemini API, bypassing the backend. The model generates answers in real time, often referencing the latest available information.
+- **Benefits:** This integration enables users to receive live, web-augmented answers, making the system more current and versatile. It complements the local RAG pipeline by providing an option for up-to-date, internet-informed responses.
+
+Summary
+-------
+Temporal-Aware RAG is a feature-rich, extensible, and user-friendly RAG system that demonstrates how semantic search, temporal intelligence, and modern LLMs can be combined to deliver high-quality, contextually relevant answers. It is ideal for learning, research, and as a foundation for more advanced AI-powered knowledge systems. 

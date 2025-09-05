@@ -1,0 +1,435 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Temporal-Aware RAG</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'ragapp/favicon.svg' %}">
+    <link rel="alternate icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="stylesheet" href="{% static 'ragapp/style.css' %}?v=3">
+</head>
+<body>
+    <div class="container" aria-label="Main content">
+        <button class="dark-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode">🌙 Dark Mode</button>
+        <h1>🧠 Temporal-Aware RAG</h1>
+        
+        <!-- Mode Toggle -->
+        <div class="mode-toggle" aria-label="Answer mode toggle">
+            <label class="mode-option" aria-label="Regular Mode">
+                <input type="radio" name="mode" value="regular" {% if mode != "conversational" and mode != "web" %}checked{% endif %}>
+                <span class="mode-label">📝 Regular Mode</span>
+            </label>
+            <label class="mode-option" aria-label="Conversational Mode">
+                <input type="radio" name="mode" value="conversational" {% if mode == "conversational" %}checked{% endif %}>
+                <span class="mode-label">💬 Conversational Mode</span>
+            </label>
+            <label class="mode-option" aria-label="Web Answer Mode">
+                <input type="radio" name="mode" value="web" {% if mode == "web" %}checked{% endif %}>
+                <span class="mode-label">🌐 Web Answer</span>
+            </label>
+        </div>
+        
+        <!-- Streaming Toggle -->
+        <div class="streaming-toggle" aria-label="Streaming toggle">
+            <label class="streaming-option">
+                <input type="checkbox" id="streaming-enabled">
+                <span class="streaming-label">⚡ Live Streaming</span>
+            </label>
+        </div>
+        
+        <form method="POST" class="query-form" id="query-form" aria-label="Ask a question">
+        {% csrf_token %}
+        <input type="text" name="query" id="query-input" placeholder="Ask a question..." required aria-label="Question input">
+            <input type="hidden" name="mode" id="selected-mode" value="{% if mode == 'conversational' %}conversational{% elif mode == 'web' %}web{% else %}regular{% endif %}">
+
+            <!-- Temporal Filter Dropdown -->
+            <label for="temporal-filter" class="sr-only">Time Range</label>
+            <select id="temporal-filter" class="temporal-filter" aria-label="Time Range">
+                <option value="all">All time</option>
+                <option value="year">Past year</option>
+                <option value="5years">Past 5 years</option>
+                <option value="custom">Custom range</option>
+            </select>
+            <span id="custom-range-fields" style="display:none; align-items:center; gap:4px;">
+                <label for="start-year" class="sr-only">Start year</label>
+                <input type="number" id="start-year" min="1900" max="2100" placeholder="Start" style="width:70px;">
+                <label for="end-year" class="sr-only">End year</label>
+                <input type="number" id="end-year" min="1900" max="2100" placeholder="End" style="width:70px;">
+            </span>
+        <button type="submit" aria-label="Generate answer">Generate Answer</button>
+    </form>
+    <div id="web-answer-card" class="card answer-card" style="display:none; margin-bottom:32px;"></div>
+    
+    <!-- Streaming Answer Container -->
+    <div id="streaming-answer-container" class="card answer-card" style="display:none; margin-bottom:32px;">
+        <h3>⚡ Live Answer</h3>
+        <div id="streaming-answer" class="answer" style="white-space: pre-line;"></div>
+        <div id="streaming-status" style="color: var(--secondary); font-size: 0.9em; margin-top: 8px;"></div>
+    </div>
+
+    {% if query %}
+            <div class="card query-card" style="margin-bottom: 32px;">
+                <h2>🔍 Query</h2>
+                <p>{{ query }}</p>
+            </div>
+            
+            
+            {% if mode == "conversational" %}
+                <!-- Conversational Chat Interface -->
+                <div class="card chat-card" style="margin-bottom: 32px;">
+                    <h3>💬 Conversational Answer</h3>
+                    <div class="chat-container">
+                        <div class="chat-messages">
+                            {% for message in answer %}
+                                <div class="message assistant-message">
+                                    <div class="message-content">
+                                        {{ message.content|safe }}
+                                    </div>
+                                    <div class="message-timestamp">{{ forloop.counter }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Regular Answer Display -->
+                <div class="card answer-card" style="margin-bottom: 32px;">
+                    <h3>🗞️ Answer</h3>
+                    <div class="answer" style="white-space: pre-line;">{{ answer|safe }}</div>
+                </div>
+            {% endif %}
+
+            <!-- Suggested Follow-up Questions -->
+            <div class="card followup-card" id="followup-card" style="display:none; margin-bottom: 32px;">
+                <h3>🤔 Suggested Follow-up Questions</h3>
+                <ul id="followup-list" style="list-style: disc; padding-left: 24px;"></ul>
+            </div>
+        {% endif %}
+
+        <div class="card docs-card" style="margin-bottom: 32px;">
+            <h3>📜 Retrieved Documents</h3>
+    <ul>
+        {% for score, doc in context_docs %}
+            <li>
+                <strong>{{ doc.timestamp }}</strong> — {{ doc.text }}<br>
+                <em>Score: {{ score|floatformat:3 }}</em>
+            </li>
+        {% endfor %}
+    </ul>
+        </div>
+        
+    </div>
+    <footer style="text-align:center; color:var(--border); font-size:0.98em; margin: 48px 0 16px 0;">
+        <span>&copy; 2025 Temporal-Aware RAG &mdash; Modern RAG <br>
+        Contact: <a href="mailto:aksharkakumani@outlook.com" style="color:var(--primary);text-decoration:none;">aksharkakumani@outlook.com</a> | LinkedIn: <a href="https://www.linkedin.com/in/akshar-kakumani-507b891b8/" style="color:var(--primary);text-decoration:none;">Akshar Kakumani</a></span>
+    </footer>
+    
+    <script>
+        
+        // Dark mode toggle logic
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            document.querySelector('.dark-toggle').textContent = document.body.classList.contains('dark-mode') ? '☀️ Light Mode' : '🌙 Dark Mode';
+        }
+        
+        // Mode toggle logic
+        document.querySelectorAll('input[name="mode"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.getElementById('selected-mode').value = this.value;
+            });
+        });
+        
+        // On load, set dark mode if previously chosen
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.querySelector('.dark-toggle').textContent = '☀️ Light Mode';
+        }
+        
+        // Animate messages in conversational mode
+        {% if mode == "conversational" and answer %}
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = document.querySelectorAll('.assistant-message');
+            messages.forEach((message, index) => {
+                message.style.opacity = '0';
+                message.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    message.style.transition = 'all 0.5s ease';
+                    message.style.opacity = '1';
+                    message.style.transform = 'translateY(0)';
+                }, index * 300);
+            });
+        });
+    {% endif %}
+
+    // Temporal Filter Logic
+    const filter = document.getElementById('temporal-filter');
+    const customFields = document.getElementById('custom-range-fields');
+    const startYear = document.getElementById('start-year');
+    const endYear = document.getElementById('end-year');
+    filter.addEventListener('change', function() {
+        if (filter.value === 'custom') {
+            customFields.style.display = 'inline-flex';
+        } else {
+            customFields.style.display = 'none';
+        }
+    });
+
+    // Query Augmentation on Submit
+    document.getElementById('query-form').addEventListener('submit', function(e) {
+        const queryInput = document.getElementById('query-input');
+        let query = queryInput.value.trim();
+        const now = new Date();
+        if (filter.value === 'year') {
+            query += ' recent';
+        } else if (filter.value === '5years') {
+            query += ` from ${now.getFullYear() - 5} to ${now.getFullYear()}`;
+        } else if (filter.value === 'custom') {
+            const sYear = startYear.value;
+            const eYear = endYear.value;
+            if (sYear && eYear && Number(sYear) <= Number(eYear)) {
+                query += ` from ${sYear} to ${eYear}`;
+            } else {
+                alert('Please enter a valid custom year range.');
+                e.preventDefault();
+                return false;
+            }
+        }
+        queryInput.value = query;
+    });
+    </script>
+    <script>
+        // Web Answer mode: Gemini API integration (frontend-only)
+        document.getElementById('query-form').addEventListener('submit', async function(e) {
+            const mode = document.querySelector('input[name="mode"]:checked').value;
+            if (mode === 'web') {
+                e.preventDefault();
+                const queryInput = document.getElementById('query-input');
+                const query = queryInput.value.trim();
+                const answerCard = document.getElementById('web-answer-card');
+                answerCard.style.display = 'block';
+                answerCard.innerHTML = '<h3>🌐 Web Answer</h3><div class="answer">Loading...</div>';
+                try {
+                    const response = await fetch('/gemini/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: JSON.stringify({
+                            query: query
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error('API error: ' + response.status);
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    let content = data.content || 'No answer received.';
+                    answerCard.innerHTML = '<h3>🌐 Web Answer</h3><div class="answer" style="white-space: pre-line;">' + content + '</div>';
+                } catch (err) {
+                    answerCard.innerHTML = '<h3>🌐 Web Answer</h3><div class="answer" style="color:var(--error);">Error: ' + err.message + '</div>';
+                }
+                return false;
+            }
+            // For other modes, allow normal backend submission
+        });
+    </script>
+    {% if answer %}
+    <script>
+    // Follow-up Questions Logic
+    const followupTemplates = [
+        "Can you provide more recent examples?",
+        "What are the main challenges in this area?",
+        "How does this compare to previous years?",
+        "What are the future trends?",
+        "Can you give a summary of key points?",
+        "Who are the main stakeholders involved?",
+        "What are the risks and opportunities?",
+        "How has this evolved over time?",
+        "What are the best practices?",
+        "Are there any notable case studies?"
+    ];
+    function pickFollowups(query, n=3) {
+        // Simple heuristic: pick based on keywords, else random
+        const lower = query ? query.toLowerCase() : "";
+        let pool = [...followupTemplates];
+        if (lower.includes("security")) pool.unshift("What are the main security risks?", "How can these threats be mitigated?");
+        if (lower.includes("cloud")) pool.unshift("What are the benefits of cloud adoption?", "How does this impact cloud costs?");
+        if (lower.includes("ai") || lower.includes("artificial intelligence")) pool.unshift("What are the ethical considerations in AI?", "What are the latest AI breakthroughs?");
+        // Remove duplicates
+        pool = [...new Set(pool)];
+        // Pick n random
+        const shuffled = pool.sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, n);
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const card = document.getElementById('followup-card');
+        const list = document.getElementById('followup-list');
+        const query = "{{ query|escapejs }}";
+        const followups = pickFollowups(query);
+        list.innerHTML = '';
+        followups.forEach(fq => {
+            const li = document.createElement('li');
+            const btn = document.createElement('button');
+            btn.textContent = fq;
+            btn.className = 'followup-btn';
+            btn.style.margin = '6px 0';
+            btn.style.background = 'var(--secondary)';
+            btn.style.color = '#fff';
+            btn.style.border = 'none';
+            btn.style.borderRadius = '6px';
+            btn.style.padding = '6px 14px';
+            btn.style.cursor = 'pointer';
+            btn.onclick = function() {
+                document.getElementById('query-input').value = fq;
+                document.getElementById('query-form').submit();
+            };
+            li.appendChild(btn);
+            list.appendChild(li);
+        });
+        card.style.display = '';
+    });
+    </script>
+    {% else %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('followup-card').style.display = 'none';
+    });
+    </script>
+    {% endif %}
+    
+    <!-- Streaming JavaScript -->
+    <script>
+        let currentStream = null;
+        
+        // Handle form submission with streaming
+        document.getElementById('query-form').addEventListener('submit', async function(e) {
+            const mode = document.querySelector('input[name="mode"]:checked').value;
+            const streamingEnabled = document.getElementById('streaming-enabled').checked;
+            
+            // Handle web mode separately
+            if (mode === 'web') {
+                // Existing web mode logic remains unchanged
+                return;
+            }
+            
+            // Handle streaming mode
+            if (streamingEnabled && mode !== 'web') {
+                e.preventDefault();
+                await handleStreamingRequest();
+                return;
+            }
+            
+            // For non-streaming requests, let the form submit normally
+        });
+        
+        async function handleStreamingRequest() {
+            const queryInput = document.getElementById('query-input');
+            const query = queryInput.value.trim();
+            const mode = document.querySelector('input[name="mode"]:checked').value;
+            
+            if (!query) return;
+            
+            // Show streaming container
+            const streamingContainer = document.getElementById('streaming-answer-container');
+            const streamingAnswer = document.getElementById('streaming-answer');
+            const streamingStatus = document.getElementById('streaming-status');
+            
+            streamingContainer.style.display = 'block';
+            streamingAnswer.innerHTML = '';
+            streamingStatus.textContent = 'Connecting...';
+            
+            // Hide other answer containers
+            document.getElementById('web-answer-card').style.display = 'none';
+            
+            try {
+                // Cancel any existing stream
+                if (currentStream) {
+                    currentStream.abort();
+                }
+                
+                const controller = new AbortController();
+                currentStream = controller;
+                
+                const response = await fetch('/stream/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        mode: mode
+                    }),
+                    signal: controller.signal
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                
+                streamingStatus.textContent = 'Generating answer...';
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    
+                    if (done) {
+                        streamingStatus.textContent = 'Complete!';
+                        break;
+                    }
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // Keep incomplete line in buffer
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                
+                                if (data.error) {
+                                    streamingStatus.textContent = `Error: ${data.error}`;
+                                    streamingAnswer.innerHTML += `<span style="color: var(--error);">Error: ${data.error}</span>`;
+                                    break;
+                                }
+                                
+                                if (data.content) {
+                                    streamingAnswer.innerHTML += data.content;
+                                    // Auto-scroll to bottom
+                                    streamingAnswer.scrollTop = streamingAnswer.scrollHeight;
+                                }
+                            } catch (e) {
+                                console.error('Error parsing streaming data:', e);
+                            }
+                        }
+                    }
+                }
+                
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    streamingStatus.textContent = 'Request cancelled';
+                } else {
+                    streamingStatus.textContent = `Error: ${error.message}`;
+                    streamingAnswer.innerHTML += `<span style="color: var(--error);">Error: ${error.message}</span>`;
+                }
+            } finally {
+                currentStream = null;
+            }
+        }
+        
+        // Cancel streaming when user navigates away or refreshes
+        window.addEventListener('beforeunload', function() {
+            if (currentStream) {
+                currentStream.abort();
+            }
+        });
+    </script>
+</body>
+</html>

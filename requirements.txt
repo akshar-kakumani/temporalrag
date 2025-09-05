@@ -1,0 +1,8 @@
+Django
+faiss-cpu
+sentence-transformers
+numpy
+requests
+gunicorn
+python-dotenv
+whitenoise  
