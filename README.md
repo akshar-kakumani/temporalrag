@@ -74,7 +74,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Configure Environment Variables
+### 3. Create Environment Variables
 
 Copy the example environment file and add your API keys:
 
