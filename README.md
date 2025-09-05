@@ -1,6 +1,16 @@
-# Temporal-Aware RAG (Django)
+# TemporalRAG (Django)
 
-This is a simple Retrieval-Augmented Generation (RAG) project built using Django. It enhances document retrieval based on both semantic similarity and temporal relevance (i.e., recent or old documents depending on the query context).
+A modern Retrieval-Augmented Generation (RAG) application built with Django featuring real-time streaming responses, multiple answer modes, and temporal-aware document retrieval. The app combines semantic similarity with temporal relevance to provide contextually appropriate answers.
+
+## ✨ Features
+
+- **🚀 Live Streaming**: Real-time word-by-word answer generation
+- **💬 Multiple Modes**: Regular, Conversational, and Web Answer modes
+- **⏰ Temporal Intelligence**: Time-aware document ranking and filtering
+- **🌐 Web Integration**: Direct web search capabilities via Gemini API
+- **🎨 Modern UI**: Dark mode, responsive design, and smooth animations
+- **🔒 Secure**: Environment-based API key management
+- **☁️ Production Ready**: Optimized for AWS Elastic Beanstalk deployment
 
 ---
 
@@ -10,102 +20,217 @@ This is a simple Retrieval-Augmented Generation (RAG) project built using Django
 temporalrag/
 ├── manage.py
 ├── requirements.txt
+├── Procfile                    # For Heroku-style deployments
+├── .env                        # Environment variables (create from .env.example)
+├── .env.example               # Template for environment variables
+├── .gitignore                 # Git ignore rules
 ├── ragapp/
-│   ├── docs.json
-│   ├── ingest.py
-│   ├── utils.py
-│   ├── views.py
-│   ├── embeddings.pkl (created after running ingest.py)
-│   ├── index.faiss (created after running ingest.py)
+│   ├── docs.json              # Knowledge base (400+ AI/tech documents)
+│   ├── ingest.py              # Data processing script
+│   ├── utils.py               # Utility functions
+│   ├── views.py               # Main application logic
+│   ├── urls.py                # URL routing
+│   ├── embeddings.pkl         # Processed embeddings (created after ingest.py)
+│   ├── index.faiss            # FAISS search index (created after ingest.py)
 │   ├── templates/
 │   │   └── ragapp/
-│   │       └── home.html
-│   ├── static/
-│   │   └── ragapp/
-│   │       └── style.css
+│   │       └── home.html      # Main UI template
+│   └── static/
+│       └── ragapp/
+│           ├── style.css      # Modern CSS with dark mode
+│           └── favicon.svg    # App favicon
+└── temporalrag/
+    ├── settings.py            # Django settings with environment variables
+    ├── urls.py                # Main URL configuration
+    └── wsgi.py                # WSGI application
 ```
 
 ---
 
-## 🚀 How to Run the Project
+## 🚀 Quick Start
 
-### 1. Clone or Download the Repository
-
-Unzip the project folder or clone it from your repository.
-
-### 2. Install Dependencies
-
-Make sure Python is installed, then install required packages:
+### 1. Clone the Repository
 
 ```bash
+git clone <your-repo-url>
+cd temporalrag
+```
+
+### 2. Set Up Environment
+
+Create a virtual environment and install dependencies:
+
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 3. Create Embedding Index
+### 3. Configure Environment Variables
 
-Run this script to encode documents and create the FAISS index:
+Copy the example environment file and add your API keys:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` file with your API keys:
+
+```env
+DJANGO_SECRET_KEY=your-secret-key-here
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+GROQ_API_KEY=your-groq-api-key
+GEMINI_API_KEY=your-gemini-api-key
+```
+
+**Get API Keys:**
+- **Groq API**: [console.groq.com](https://console.groq.com) (for LLM responses)
+- **Gemini API**: [makersuite.google.com](https://makersuite.google.com) (for web search)
+
+### 4. Create Embedding Index
+
+Run the data processing script:
 
 ```bash
 python ragapp/ingest.py
 ```
 
-This will generate:
-- `embeddings.pkl`
-- `index.faiss`
+This generates:
+- `ragapp/embeddings.pkl` - Document embeddings
+- `ragapp/index.faiss` - FAISS search index
 
-### 4. Set Your OpenAI API Key
-
-In `views.py`, replace:
-
-```python
-openai.api_key = "your-openai-key"
-```
-
-with your actual [OpenAI API key](https://platform.openai.com/account/api-keys).
-
-### 5. Run the Django Server
+### 5. Run the Application
 
 ```bash
+# Run database migrations
+python manage.py migrate
+
+# Collect static files
+python manage.py collectstatic --noinput
+
+# Start the development server
 python manage.py runserver
 ```
 
 Visit [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
 
+## 🎯 Usage
+
+### Answer Modes
+
+1. **📝 Regular Mode**: Standard RAG with temporal awareness
+2. **💬 Conversational Mode**: Multi-message responses for complex topics
+3. **🌐 Web Answer Mode**: Direct web search using Gemini API
+
+### Streaming Feature
+
+Enable "⚡ Live Streaming" for real-time, word-by-word answer generation.
+
+### Temporal Filtering
+
+Use the time range dropdown to focus on:
+- All time
+- Past year
+- Past 5 years
+- Custom range
+
 ---
 
-## 💡 What You Can Do
+## 💡 Example Queries
 
-- Ask time-sensitive questions like:
-  - "What are the latest advances in AI?"
-  - "What is the history of transformers in NLP?"
-  - "How has cloud security evolved in the last five years?"
-  - "What were the major cyber attacks in 2024?"
-  - "What are the recent innovations in blockchain technology?"
-  - "How has telemedicine adoption changed since 2020?"
-  - "What are the trends in robotics automation over the past decade?"
-  - "What regulatory changes have impacted AI in 2023 and 2024?"
-- The app retrieves and ranks documents using:
-  - Sentence similarity
-  - Temporal bias (recent or old depending on query)
+Try these time-sensitive questions:
+
+- **Recent AI Developments**: "What are the latest advances in AI in 2024?"
+- **Historical Context**: "What is the history of transformers in NLP?"
+- **Evolution Analysis**: "How has cloud security evolved in the last five years?"
+- **Specific Timeframes**: "What were the major cyber attacks in 2024?"
+- **Technology Trends**: "What are the recent innovations in blockchain technology?"
+- **Industry Changes**: "How has telemedicine adoption changed since 2020?"
+- **Long-term Trends**: "What are the trends in robotics automation over the past decade?"
+- **Regulatory Updates**: "What regulatory changes have impacted AI in 2023 and 2024?"
+
+## 🔧 Technical Architecture
+
+The app uses a sophisticated retrieval system:
+
+1. **Document Processing**: 400+ AI/tech documents with timestamps
+2. **Embedding Generation**: Sentence-Transformers (all-MiniLM-L6-v2)
+3. **Vector Search**: FAISS for fast similarity search
+4. **Temporal Scoring**: Time-aware document ranking
+5. **LLM Integration**: Groq API for fast response generation
+6. **Streaming**: Server-Sent Events for real-time updates
 
 ---
 
 ## 📚 Technologies Used
 
-- Django (web framework)
-- Sentence-Transformers (semantic embeddings)
-- FAISS (fast document indexing)
-- OpenAI (text generation)
-- HTML/CSS for frontend
+- **Backend**: Django, Python
+- **AI/ML**: Sentence-Transformers, FAISS, Groq API, Gemini API
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Deployment**: AWS Elastic Beanstalk, WhiteNoise
+- **Data**: JSON, Pickle, NumPy
 
 ---
 
-## ✅ Next Steps
+## 🚀 Deployment
 
-- Add upload feature to inject new documents
-- Log past queries and responses
-- Deploy on Render or Railway
+### AWS Elastic Beanstalk
+
+1. **Prepare for deployment**:
+   ```bash
+   # Install dependencies
+   pip install -r requirements.txt
+   
+   # Collect static files
+   python manage.py collectstatic --noinput
+   
+   # Create deployment package
+   zip -r temporalrag.zip . -x "venv/*" ".git/*" "*.pyc" "__pycache__/*"
+   ```
+
+2. **Set environment variables in EB**:
+   - `DJANGO_SECRET_KEY`
+   - `DEBUG=False`
+   - `ALLOWED_HOSTS=your-domain.elasticbeanstalk.com`
+   - `GROQ_API_KEY`
+   - `GEMINI_API_KEY`
+
+3. **Deploy**: Upload the zip file to Elastic Beanstalk
+
+### Other Platforms
+
+- **Heroku**: Use the included `Procfile`
+- **Railway/Render**: Follow standard Django deployment guides
 
 ---
 
-Built for learning and demonstrating how RAG can be customized with temporal intelligence.
+## 🔒 Security Features
+
+- Environment-based API key management
+- CSRF protection enabled
+- Secure static file serving with WhiteNoise
+- Non-root user in production containers
+- Health check endpoints for monitoring
+
+---
+
+## 📈 Performance Optimizations
+
+- Lazy loading of ML models and embeddings
+- FAISS vector search for fast retrieval
+- Streaming responses for better UX
+- Compressed static files with cache headers
+- Optimized database queries
+
+---
+
+Built for learning and demonstrating modern RAG applications with temporal intelligence and real-time streaming capabilities.
