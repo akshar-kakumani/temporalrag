@@ -1,6 +1,6 @@
 # TemporalRAG (Django)
 
-A modern Retrieval-Augmented Generation (RAG) application built with Django featuring real-time streaming responses, multiple answer modes, and temporal-aware document retrieval. The app combines semantic similarity with temporal relevance to provide contextually appropriate answers.
+A modern Retrieval-Augmented Generation (RAG) application prototype built with Django featuring real-time streaming responses, multiple answer modes, and temporal-aware document retrieval. The app combines semantic similarity with temporal relevance to provide contextually appropriate answers.
 
 ## ✨ Features
 
