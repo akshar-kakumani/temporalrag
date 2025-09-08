@@ -76,12 +76,6 @@ pip install -r requirements.txt
 
 ### 3. Create Environment Variables
 
-Copy the example environment file and add your API keys:
-
-```bash
-cp .env.example .env
-```
-
 Edit `.env` file with your API keys:
 
 ```env
