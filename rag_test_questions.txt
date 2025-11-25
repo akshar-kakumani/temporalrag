@@ -1,0 +1,148 @@
+# Temporal-Aware RAG Test Questions
+# ===============================
+# These questions are designed to test different aspects of the RAG system:
+# - Recent vs historical information retrieval
+# - Company-specific developments
+# - Regulatory and compliance topics
+# - Technical evolution and trends
+# - Comparative analysis
+
+## Recent AI Developments (2024-2025)
+=====================================
+
+1. What are the latest major AI model releases from 2024?
+2. How has Nvidia's Blackwell chip impacted AI processing in 2024?
+3. What new capabilities does Claude 3.5 Sonnet offer compared to previous models?
+4. How did the EU AI Act change AI regulation in 2024?
+5. What are the key features of GPT-4o and o1 models released in 2024?
+6. How has Google Gemini 2.0 advanced multimodal AI capabilities?
+7. What privacy-focused features does Apple Intelligence bring to mobile devices?
+8. How has xAI's Grok influenced the AI landscape in 2024?
+9. What breakthroughs occurred in AI safety and alignment in 2024?
+10. How have AI chip developments evolved in the last year?
+
+## Historical AI Context (2017-2023)
+===================================
+
+11. What was the significance of the Transformer architecture introduced around 2017?
+12. How did ChatGPT's release in 2022 change public perception of AI?
+13. What were the major AI developments during the 2020-2023 period?
+14. How has the AI research landscape evolved since 2017?
+15. What were the key milestones in large language model development from 2018 to 2023?
+16. How did the COVID-19 pandemic influence AI adoption in healthcare?
+17. What regulatory discussions were happening before the EU AI Act in 2024?
+18. How have AI ethics concerns evolved over the past five years?
+19. What were the major acquisitions and partnerships in AI between 2020 and 2023?
+20. How has open-source AI development changed since 2017?
+
+## Company-Specific Questions
+===========================
+
+21. What are Google's most significant AI contributions in recent years?
+22. How has Meta's AI strategy evolved under different leadership?
+23. What unique approaches has xAI taken compared to other AI companies?
+24. How has Microsoft's AI integration changed Windows and Office products?
+25. What are Apple's key differentiators in AI development?
+26. How has Anthropic positioned itself in the AI safety landscape?
+27. What role has OpenAI played in shaping modern AI development?
+28. How have Nvidia's GPU developments enabled AI breakthroughs?
+29. What AI initiatives has the EU undertaken beyond regulation?
+30. How have Chinese tech companies contributed to global AI development?
+
+## Regulatory and Compliance Topics
+==================================
+
+31. What are the key requirements of the EU AI Act for high-risk AI systems?
+32. How do different countries approach AI regulation?
+33. What compliance challenges do companies face with AI deployment?
+34. How has AI regulation evolved from voluntary guidelines to mandatory laws?
+35. What are the implications of AI regulation for small vs large companies?
+36. How do privacy laws interact with AI development requirements?
+37. What certification processes exist for AI systems?
+38. How have international standards for AI safety developed?
+39. What are the penalties for non-compliance with AI regulations?
+40. How do regulators balance innovation with safety in AI development?
+
+## Technical Evolution and Trends
+=================================
+
+41. How have large language models evolved in terms of size and capability?
+42. What advancements have occurred in multimodal AI (text, image, audio)?
+43. How has AI hardware development kept pace with software advancements?
+44. What are the current trends in AI model training efficiency?
+45. How has federated learning impacted privacy-preserving AI?
+46. What developments have occurred in AI for edge computing?
+47. How have AI algorithms evolved for different industry applications?
+48. What are the latest breakthroughs in AI reasoning and planning?
+49. How has AI model compression and optimization improved deployment?
+50. What are the emerging trends in AI-human collaboration?
+
+## Comparative and Analytical Questions
+======================================
+
+51. How do different AI companies approach the challenge of AI safety?
+52. What are the trade-offs between open-source and proprietary AI models?
+53. How do various AI models compare in terms of performance and efficiency?
+54. What are the differences between US, EU, and Asian approaches to AI?
+55. How do consumer AI applications differ from enterprise AI solutions?
+56. What are the advantages and disadvantages of different AI architectures?
+57. How do various AI chips compare in terms of performance and power efficiency?
+58. What are the differences between rule-based AI and machine learning approaches?
+59. How do different AI deployment strategies (cloud vs edge vs on-device) compare?
+60. What are the varying approaches to AI explainability and transparency?
+
+## Industry-Specific Applications
+==============================
+
+61. How has AI transformed healthcare diagnostics in recent years?
+62. What AI applications have emerged in autonomous vehicles?
+63. How is AI being used in financial services and risk assessment?
+64. What role does AI play in modern manufacturing and robotics?
+65. How has AI impacted content creation and media production?
+66. What AI applications exist in environmental monitoring and climate science?
+67. How is AI being used in education and personalized learning?
+68. What AI tools are available for software development and coding?
+69. How has AI changed customer service and support automation?
+70. What AI applications are emerging in agriculture and food production?
+
+## Future and Emerging Trends
+=============================
+
+71. What are the current predictions for AGI development timelines?
+72. How might quantum computing impact future AI development?
+73. What are the emerging trends in AI for scientific research?
+74. How will AI regulation evolve in the coming years?
+75. What new AI applications are expected in the next 2-3 years?
+76. How might AI change the nature of work and employment?
+77. What are the potential risks of advanced AI systems?
+78. How will AI development be affected by energy and sustainability concerns?
+79. What are the trends in AI for social good and humanitarian applications?
+80. How might AI transform education and lifelong learning?
+
+## Technical Deep Dive Questions
+==============================
+
+81. How do transformer architectures work compared to previous NLP approaches?
+82. What are the differences between various attention mechanisms in AI?
+83. How do different fine-tuning approaches affect AI model performance?
+84. What are the challenges and solutions in AI model training at scale?
+85. How do various AI evaluation metrics compare and what do they measure?
+86. What are the trade-offs in AI model size vs performance vs efficiency?
+87. How do different AI inference optimization techniques work?
+88. What are the approaches to handling bias and fairness in AI systems?
+89. How do federated learning and distributed training differ?
+90. What are the security considerations for AI model deployment?
+
+## Business and Economic Impact
+==============================
+
+91. How has AI affected startup ecosystems and venture capital?
+92. What are the economic implications of widespread AI adoption?
+93. How do different industries measure ROI from AI investments?
+94. What are the challenges in AI talent acquisition and training?
+95. How has AI changed competitive dynamics between companies?
+96. What are the cost-benefit considerations for AI implementation?
+97. How do AI investments vary across different company sizes?
+98. What are the market trends in AI services and consulting?
+99. How has AI affected intellectual property and patent landscapes?
+100. What are the economic barriers to AI adoption in developing countries?
